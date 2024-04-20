@@ -5,7 +5,7 @@ import { FcGoogle } from "react-icons/fc";
 import { LucideLoaderCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
-const Login = () => {
+const Page = () => {
   const [isLoading, setIsLoading] = useState(false);
 
   const loginWithGoogle = async () => {
@@ -45,4 +45,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default Page;

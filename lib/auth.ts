@@ -25,7 +25,7 @@ export const authOptions:NextAuthOptions={
         strategy:'jwt'
     },
     pages:{
-        signIn:'/Login'
+        signIn:'/login'
     },
     providers:[
         Google({
@@ -46,7 +46,7 @@ export const authOptions:NextAuthOptions={
                 id:dbUser.id,
                 name:dbUser.name,
                 email:dbUser.email,
-                image:dbUser.image,
+                picture:dbUser.image,
             }
         },
         async session ({session, token}){
@@ -59,7 +59,7 @@ export const authOptions:NextAuthOptions={
             return session;
         },
         redirect(){
-            return '/Dashboard'
+            return '/dashboard'
         }
     }
 }
