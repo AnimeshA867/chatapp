@@ -1,6 +1,6 @@
 "use client";
 import { Loader2, LogOutIcon } from "lucide-react";
-import { Button } from "./ui/button";
+import Button from "./ui/button";
 import { signOut } from "next-auth/react";
 import { FC, useState } from "react";
 import toast from "react-hot-toast";

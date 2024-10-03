@@ -10,12 +10,12 @@ export async function fetchRedis(command:Commands,...args:(string|number)[]){
 
           const response= await fetch(commandUrl,{
             headers:{
-                Authorization:`Bearer ${process.env.UPSTASH_REDIS_TOKEN}`
+                Authorization:`Bearer ${authToken}`
             },
             cache:'no-store',
         })
     if(!response.ok){
-        throw new Error(`Error executing Redis Command: ${response.statusText}`)
+        // throw new Error(`Error executing Redis Command: ${response.statusText}`)
     }
 
     const data = await response.json();

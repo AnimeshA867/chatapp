@@ -1,10 +1,11 @@
 "use client";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
 import React, { useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { LucideLoaderCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
 import toast from "react-hot-toast";
+
 const Page = () => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -36,7 +37,11 @@ const Page = () => {
             className="max-w-sm mx-auto w-full"
             onClick={loginWithGoogle}
           >
-            {isLoading ? <LucideLoaderCircle /> : <FcGoogle />}
+            {isLoading ? (
+              <LucideLoaderCircle className="animate-spin h-4 w-4" />
+            ) : (
+              <FcGoogle />
+            )}
             Sign in With Google
           </Button>
         </div>

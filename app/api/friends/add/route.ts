@@ -39,7 +39,7 @@ export async function POST(req:NextRequest){
             return new Response('Already your friend.',{status:400})
         }
 
-        //Valid Friend request:
+        //Valid Friend request:4263eeda8f56
 
         db.sadd(`user:${idToAdd}:incoming_friend_requests`,session.user.id)
 

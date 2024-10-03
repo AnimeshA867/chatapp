@@ -6,6 +6,10 @@ import { Icon, Icons } from "@/components/Icons";
 import Image from "next/image";
 import LogOut from "@/components/LogOut";
 import { redirect } from "next/navigation";
+import FriendRequestSidebarOption from "@/components/FriendRequestSidebarOption";
+import { fetchRedis } from "../helper/redis";
+import getFriendsByUserId from "../helper/get-friends-by-user";
+import SideBarChatList from "@/components/SideBarChatList";
 interface SidebarOption {
   id: number;
   name: string;
@@ -17,7 +21,7 @@ const sidebarOptions: SidebarOption[] = [
   {
     id: 1,
     name: "Add Friend",
-    href: "/Dashboard/Add",
+    href: "/dashboard/add",
     Icon: "UserPlus",
   },
 ];
@@ -34,6 +38,14 @@ export default async function Layout({
   const session = await getServerSession(authOptions);
 
   if (!session) notFound();
+  const friends = await getFriendsByUserId(session?.user.id);
+
+  const unseenRequestCount = (
+    await fetchRedis(
+      "smembers",
+      `user:${session?.user.id}:incoming_friend_requests`
+    )
+  ).length;
 
   return (
     <section className="w-full flex h-screen ">
@@ -41,16 +53,17 @@ export default async function Layout({
         <Link href="/dashboard">
           <Icons.Logo className="h-8 w-auto text-indigo-600 " />
         </Link>
-        <div className="text-sm font-semibold leading-6 text-gray-500">
-          Your Chats
-        </div>
+        {friends.length > 0 ? (
+          <div className="text-sm font-semibold leading-6 text-gray-500">
+            Your Chats
+          </div>
+        ) : null}
 
         <nav className="flex flex-1 flex-col ">
           <ul role="list" className="flex flex-1 flex-col gap-y-7">
-            {" "}
-            {/* <li>Chat does the user have</li> */}
+            <SideBarChatList friends={friends} sessionId={session?.user.id} />
             <li>
-              <div className="text-xs font-semibold leading-6 text-gray-700">
+              <div className="text-xs font-semibold leading-6 text-gray-500">
                 Overview
               </div>
               <ul role="list" className="-mx-2 mt-2 space-y-1">
@@ -71,6 +84,12 @@ export default async function Layout({
                   );
                 })}
               </ul>
+            </li>
+            <li>
+              <FriendRequestSidebarOption
+                sessionId={session?.user.id}
+                initialUnSeenRequestCount={unseenRequestCount}
+              />
             </li>
             <li className="-mx-6 mt-auto flex items-center ">
               <div className="flex flex-1 items-center gap-x-4 py-3 text-sm font-semibold leading-6 text-gray-900">

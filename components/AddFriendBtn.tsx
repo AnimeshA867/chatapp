@@ -35,7 +35,6 @@ const AddFriendBtn: FC<AddFriendBtnProps> = ({}) => {
   // 2. Define a submit handler.
   function onSubmit(formData: z.infer<typeof formSchema>) {
     addFriend(formData.email);
-    console.log(formData);
   }
 
   const addFriend = async (email: string) => {

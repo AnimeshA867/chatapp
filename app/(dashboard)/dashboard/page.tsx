@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import LogOut from "@/components/LogOut";
 const Page = async () => {
   const session = await getServerSession(authOptions);
-  console.log(session);
+
   return <></>;
 };
 
