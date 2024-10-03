@@ -31,7 +31,7 @@ const page: FC<pageProps> = async ({}) => {
   );
 
   return (
-    <main className="pt-8 flex justify-center items-center flex-col">
+    <main className="pt-8 flex justify-center items-center flex-col w-full h-full">
       <h1 className={"font-bold text-5xl mb-8"}>Friend Requests</h1>
       <div className="flex flex-col gap-4 ">
         <FriendRequests

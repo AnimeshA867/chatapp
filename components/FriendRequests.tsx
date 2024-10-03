@@ -1,11 +1,13 @@
 "use client";
 
+import Skeleton from "react-loading-skeleton"; // Assuming you're using shadcn-ui skeleton loader
 import { FC, useEffect, useState } from "react";
 import { Check, UserPlus, X } from "lucide-react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import { pusherClient } from "@/lib/pusher";
 import { toPusherKey } from "@/lib/utils";
+import React from "react";
 
 interface FriendRequestsProps {
   incomingFriendRequests: IncomingFriendRequest[];
@@ -20,6 +22,7 @@ const FriendRequests: FC<FriendRequestsProps> = ({
   const [friendRequests, setFriendRequests] = useState<IncomingFriendRequest[]>(
     incomingFriendRequests
   );
+  const [loading, setLoading] = useState(true);
 
   const friendRequestHandler = ({
     senderId,
@@ -30,15 +33,14 @@ const FriendRequests: FC<FriendRequestsProps> = ({
 
   const acceptFriend = async (senderId: string) => {
     await axios.post("/api/friends/accept", { id: senderId });
-
     setFriendRequests((prev) =>
       prev.filter((request) => request.senderId !== senderId)
     );
     router.refresh();
   };
+
   const rejectFriend = async (senderId: string) => {
     await axios.post("/api/friends/reject", { id: senderId });
-
     setFriendRequests((prev) =>
       prev.filter((request) => request.senderId !== senderId)
     );
@@ -49,11 +51,10 @@ const FriendRequests: FC<FriendRequestsProps> = ({
     pusherClient.subscribe(
       toPusherKey(`user:${sessionId}:incoming_friend_requests`)
     );
-    // console.log(
-    //   "Subscribed to ",
-    //   toPusherKey(`user:${sessionId}:incoming_friend_requests`)
-    // );
     pusherClient.bind("incoming_friend_requests", friendRequestHandler);
+
+    setLoading(false); // Simulate loading finished
+
     return () => {
       pusherClient.unsubscribe(
         toPusherKey(`user:${sessionId}:incoming_friend_requests`)
@@ -64,11 +65,21 @@ const FriendRequests: FC<FriendRequestsProps> = ({
 
   return (
     <>
-      {friendRequests.length === 0 ? (
-        <p className="text-sm ">You&apos;re all upto date.</p>
+      {loading ? (
+        <div className="space-y-4">
+          {/* Skeleton while loading */}
+          <Skeleton className="w-full h-8" />
+          <Skeleton className="w-full h-8" />
+          <Skeleton className="w-full h-8" />
+        </div>
+      ) : friendRequests.length === 0 ? (
+        <p className="text-sm">You&apos;re all up to date.</p>
       ) : (
         friendRequests.map((requests) => (
-          <div key={requests.senderId} className="flex gap-4 items-center">
+          <div
+            key={requests.senderId}
+            className="flex gap-4 items-center p-4 border-b"
+          >
             <UserPlus className="text-black" />
             <p className="font-medium text-lg">{requests.senderEmail}</p>
             <button

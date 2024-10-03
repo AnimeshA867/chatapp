@@ -10,6 +10,7 @@ import FriendRequestSidebarOption from "@/components/FriendRequestSidebarOption"
 import { fetchRedis } from "../helper/redis";
 import getFriendsByUserId from "../helper/get-friends-by-user";
 import SideBarChatList from "@/components/SideBarChatList";
+import MobileChatLayout from "@/components/MobileChatLayout";
 interface SidebarOption {
   id: number;
   name: string;
@@ -49,7 +50,20 @@ export default async function Layout({
 
   return (
     <section className="w-full flex h-screen ">
-      <div className="flex h-full w-full max-w-sm grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-8">
+      <div className="md:hidden fixed top-0 left-0 w-full h-16 flex justify-between items-center px-4 border-b-2 border-gray-200">
+        <MobileChatLayout
+          friends={friends}
+          sessionId={session?.user.id}
+          sessionEmail={session?.user.email}
+          sessionImage={session?.user.image}
+          sessionName={session?.user.name as string}
+          unseenRequestCount={unseenRequestCount}
+        />
+        <Link href="/dashboard" className="p-4 relative">
+          <Icons.Logo className=" h-8 w-auto text-indigo-600 " />
+        </Link>
+      </div>
+      <div className="md:flex h-full w-full max-w-sm grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-8 hidden ">
         <Link href="/dashboard" className="p-4">
           <Icons.Logo className="h-8 w-auto text-indigo-600 " />
         </Link>

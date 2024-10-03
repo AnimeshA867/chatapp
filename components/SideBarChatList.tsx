@@ -45,7 +45,6 @@ const SideBarChatList: FC<SideBarChatListProps> = ({ friends, sessionId }) => {
         sessionId as string,
         extendedMessage.senderId
       )}`;
-    console.log(pathName);
     if (!shouldNotify) return;
 
     toast.custom((t) => (
@@ -61,8 +60,6 @@ const SideBarChatList: FC<SideBarChatListProps> = ({ friends, sessionId }) => {
     ));
 
     setUnseenMessages((prev) => [...prev, extendedMessage]);
-
-    console.log(extendedMessage);
   };
 
   useEffect(() => {
@@ -88,7 +85,6 @@ const SideBarChatList: FC<SideBarChatListProps> = ({ friends, sessionId }) => {
         const unseenMessagesCount = unseenMessages.filter(
           (msg) => msg.senderId === friend.id
         ).length;
-        console.log(friend);
         return (
           <li key={friend.id}>
             <a
