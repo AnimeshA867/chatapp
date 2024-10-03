@@ -16,6 +16,7 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
   const textAreaRef = useRef<HTMLTextAreaElement | null>(null);
   const [input, setInput] = useState("");
   const sendMessage = async () => {
+    if (!input) return;
     setLoading(true);
     try {
       await axios.post("/api/message/send", { text: input, chatId });
@@ -27,6 +28,7 @@ const ChatInput: FC<ChatInputProps> = ({ chatPartner, chatId }) => {
       setLoading(false);
     }
   };
+
   return (
     <div className="border-t border-gray-200 px-4 pt-2 mmb-2 sm:mb-0 ">
       <div className="relative flex-1 overflow-hidden rounded-lg shadow-sm ring-1 ring-inset rign-gray-300 focus-within:ring-2 focus-within:ring-indigo-600">

@@ -38,7 +38,7 @@ export default async function Layout({
   const session = await getServerSession(authOptions);
 
   if (!session) notFound();
-  const friends = await getFriendsByUserId(session?.user.id);
+  const friends = await getFriendsByUserId(session?.user.id as string);
 
   const unseenRequestCount = (
     await fetchRedis(
@@ -50,7 +50,7 @@ export default async function Layout({
   return (
     <section className="w-full flex h-screen ">
       <div className="flex h-full w-full max-w-sm grow flex-col gap-y-5 overflow-y-auto border-r border-gray-200 bg-white px-8">
-        <Link href="/dashboard">
+        <Link href="/dashboard" className="p-4">
           <Icons.Logo className="h-8 w-auto text-indigo-600 " />
         </Link>
         {friends.length > 0 ? (

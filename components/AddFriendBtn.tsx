@@ -4,7 +4,7 @@ import { FC, useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { Button } from "@/components/ui/button";
+import Button from "@/components/ui/button";
 
 import axios, { AxiosError } from "axios";
 

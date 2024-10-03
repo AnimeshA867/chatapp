@@ -26,14 +26,12 @@ async function getChatMessage(chatid: string) {
     );
 
     const dbMessages = result.map((message) => JSON.parse(message) as Message);
-
-    // const reversedDbMessages = dbMessages.reverse();
-    const reversedDbMessages = dbMessages;
-
-    const messages = messageArrayValidator.parse(reversedDbMessages);
+    // const reversedDbMessages = dbMessages.reverse(); // Reverse to show latest at the bottom
+    const messages = messageArrayValidator.parse(dbMessages);
     return messages;
   } catch (error) {
-    notFound();
+    console.error("Error retrieving messages:", error);
+    throw new Error("Unable to retrieve chat messages");
   }
 }
 
@@ -89,6 +87,7 @@ const page: FC<pageProps> = async ({ params }) => {
         sessionImg={session.user.image}
         chatPartner={chatPartner}
         sessionUser={session.user.name}
+        chatId={chatid}
       />
       <ChatInput chatPartner={chatPartner} chatId={chatid} />
     </div>

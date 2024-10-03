@@ -1,17 +1,23 @@
 "use client";
 
-import { chatHrefConstructor } from "@/lib/utils";
+import { pusherClient } from "@/lib/pusher";
+import { chatHrefConstructor, toPusherKey } from "@/lib/utils";
 import { usePathname, useRouter } from "next/navigation";
 import { FC, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import UnseenChatToast from "./ui/UnseenChatToast";
 
 interface SideBarChatListProps {
   friends: User[];
   sessionId: string | undefined;
 }
 
+interface extendedMessage extends Message {
+  senderImg: string;
+  senderName: string;
+}
+
 const SideBarChatList: FC<SideBarChatListProps> = ({ friends, sessionId }) => {
-  console.log("This is working.");
-  console.log(friends);
   const router = useRouter();
   const pathName = usePathname();
 
@@ -26,6 +32,55 @@ const SideBarChatList: FC<SideBarChatListProps> = ({ friends, sessionId }) => {
       );
     }
   }, [pathName]);
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const newFriendHandler = () => {
+    router.refresh();
+  };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const chatHandler = (extendedMessage: extendedMessage) => {
+    const shouldNotify =
+      pathName !==
+      `/dashboard/chat/${chatHrefConstructor(
+        sessionId as string,
+        extendedMessage.senderId
+      )}`;
+    console.log(pathName);
+    if (!shouldNotify) return;
+
+    toast.custom((t) => (
+      //Custom Component
+      <UnseenChatToast
+        t={t}
+        sessionId={sessionId as string}
+        senderId={extendedMessage.senderId}
+        senderImage={extendedMessage.senderImg}
+        senderName={extendedMessage.senderName}
+        senderMessage={extendedMessage.text}
+      />
+    ));
+
+    setUnseenMessages((prev) => [...prev, extendedMessage]);
+
+    console.log(extendedMessage);
+  };
+
+  useEffect(() => {
+    try {
+      pusherClient.subscribe(toPusherKey(`user:${sessionId}:chats`));
+      pusherClient.subscribe(toPusherKey(`user:${sessionId}:friends`));
+      pusherClient.bind(`new_message`, chatHandler);
+      pusherClient.bind(`new_friend`, newFriendHandler);
+      return () => {
+        pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:chats`));
+        pusherClient.unsubscribe(toPusherKey(`user:${sessionId}:friends`));
+        pusherClient.unbind(`new_message`, chatHandler);
+        pusherClient.unbind(`new_friend`, newFriendHandler);
+      };
+    } catch (error) {
+      console.log(error);
+    }
+  }, [pathName, sessionId, router, chatHandler, newFriendHandler]);
 
   return (
     <ul role="list" className="max-h-[20rem] overflow-y-auto -mx-2 space-y-1">
