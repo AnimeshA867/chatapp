@@ -14,7 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import Link from "next/link";
-import { Icons } from "./Icons";
+import { Icon, Icons } from "./Icons";
 import { FC } from "react";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
@@ -30,6 +30,12 @@ interface MobileChatLayoutType {
   sessionEmail: string | undefined | null;
   sessionName: string;
   unseenRequestCount: string;
+}
+interface SidebarOption {
+  id: number;
+  name: string;
+  href: string;
+  Icon: Icon;
 }
 const sidebarOptions: SidebarOption[] = [
   {
@@ -51,7 +57,9 @@ const MobileChatLayout: FC<MobileChatLayoutType> = ({
     <div className="grid grid-cols-2 gap-2 ">
       <Sheet>
         <SheetTrigger asChild>
-          <Button className="bg-none"><Menu className="font-semibold text-3xl"/>></Button>
+          <Button className="bg-none">
+            <Menu className="font-semibold text-3xl" />
+          </Button>
         </SheetTrigger>
         <SheetContent side={"left"}>
           <SheetHeader>
