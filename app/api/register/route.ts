@@ -19,7 +19,7 @@ export async function POST(req: Request) {
         password: hashedPassword,
         id: id,
       });
-      console.log(user);
+
       await db.set(`user:${id}`, {
         email: email,
         id: id,

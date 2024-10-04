@@ -74,8 +74,8 @@ export const authOptions: NextAuthOptions = {
             image: user.image,
           };
         } catch (error) {
-          console.error("Error during authentication:", error);
-          return null;
+          const errorMessage = error as string;
+          return new Response(errorMessage, { status: 400 });
         }
       },
     }),

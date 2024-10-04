@@ -8,21 +8,29 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import React from "react";
-
 const Page = async () => {
   const session = await getServerSession(authOptions);
   if (!session) notFound();
 
   const friends = await getFriendsByUserId(session.user.id);
 
-  const friendWithLastMessageRaw = await Promise.all(
+  const friendWithLastMessage = await Promise.all(
     friends.map(async (friend) => {
-      const [lastMessageRaw] = (await fetchRedis(
+      console.log(
+        `chat:${chatHrefConstructor(session.user.id, friend.id)}:messages`
+      );
+      const [lastMessageRaw] = await fetchRedis(
         "zrange",
         `chat:${chatHrefConstructor(session.user.id, friend.id)}:messages`,
         -1,
         -1
-      )) as string[];
+      );
+
+      // Skip this friend if there's no last message
+      if (!lastMessageRaw) {
+        return;
+      }
+
       const lastMessage = JSON.parse(lastMessageRaw) as Message;
       return {
         ...friend,
@@ -30,16 +38,39 @@ const Page = async () => {
       };
     })
   );
-  const friendWithLastMessage = friendWithLastMessageRaw.filter(Boolean);
+
+  // Type guard to ensure 'friend' is not undefined
+  const isValidFriend = (
+    friend:
+      | {
+          lastMessage: Message;
+          name: string;
+          email: string;
+          image: string;
+          id: string;
+        }
+      | undefined
+  ): friend is {
+    lastMessage: Message;
+    name: string;
+    email: string;
+    image: string;
+    id: string;
+  } => {
+    return !!friend;
+  };
+
+  // Filter out undefined values using the type guard
+  const validFriends = friendWithLastMessage.filter(isValidFriend);
 
   return (
     <>
       <div className="container py-12 ">
         <h1 className="text-3xl font-semibold mb-4">Recents Chats</h1>
-        {friendWithLastMessage.length == 0 ? (
+        {validFriends.length === 0 ? (
           <p className="text-sm text-zinc-500">Nothing to show here...</p>
         ) : (
-          friendWithLastMessage.map((friend) => (
+          validFriends.map((friend) => (
             <div
               key={friend.id}
               className="relative bg-zinc-50 border-zinc-200 p-3 rounded-lg hover:ring-indigo-500 hover:ring transition ease-linear duration-200  "
