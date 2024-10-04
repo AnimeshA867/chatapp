@@ -31,18 +31,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 
 const Page = () => {
-  const searchParams = useSearchParams();
-
-  const [error, setError] = useState("");
-
-  // Handle error messages passed via query parameters
-  useEffect(() => {
-    const errorParam = searchParams?.get("error");
-    if (errorParam) {
-      setError(errorParam);
-    }
-  }, [searchParams]);
-
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -77,7 +65,7 @@ const Page = () => {
 
       if (res?.error) {
         // Set error message to be displayed
-        setError(res.error);
+
         toast.error(res.error);
       } else if (res?.ok) {
         // Redirect to dashboard on successful login
@@ -146,21 +134,6 @@ const Page = () => {
                     </FormItem>
                   )}
                 />
-
-                {/* Error message display */}
-                {error && (
-                  <div className="text-red-500 text-center">
-                    {error === "CredentialsSignin" &&
-                      "Invalid email or password."}
-                    {error === "OAuthAccountNotLinked" &&
-                      "Please sign in with the correct provider."}
-                    {error === "AccessDenied" &&
-                      "Access denied, please contact support."}
-                    {error === "Configuration" &&
-                      "Server configuration issue, try again later."}
-                    {error === "default" && "Login failed. Please try again."}
-                  </div>
-                )}
 
                 <Button type="submit" className="w-full" disabled={isLoading}>
                   {isLoading ? (
