@@ -27,7 +27,8 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/login",
+    signIn: "/login", // Sign-in page where you will display errors
+    error: "/login", // Redirect to the login page with an error message
   },
   providers: [
     Google({
@@ -53,7 +54,7 @@ export const authOptions: NextAuthOptions = {
           const userJson = await fetchRedis("get", `user:credentials:${email}`);
 
           if (!userJson) {
-            throw new Error("No user found with that email.");
+            throw new Error("User not found.");
           }
 
           // Parse the fetched user data
@@ -63,7 +64,7 @@ export const authOptions: NextAuthOptions = {
           const passwordsMatch = await bcrypt.compare(password, user.password);
 
           if (!passwordsMatch) {
-            throw new Error("Invalid password.");
+            throw new Error("Password mismatch.");
           }
 
           // If password matches, return the user object
@@ -74,8 +75,8 @@ export const authOptions: NextAuthOptions = {
             image: user.image,
           };
         } catch (error) {
-          const errorMessage = error as string;
-          return new Response(errorMessage, { status: 400 });
+          console.error("Error during authentication:", error);
+          throw new Error("Authentication failed.");
         }
       },
     }),

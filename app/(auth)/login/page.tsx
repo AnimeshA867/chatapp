@@ -1,6 +1,6 @@
 "use client";
 import Button from "@/components/ui/button";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { LucideLoaderCircle } from "lucide-react";
 import { signIn } from "next-auth/react";
@@ -22,45 +22,70 @@ import {
 import {
   Form,
   FormControl,
-  FormDescription,
   FormField,
   FormItem,
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
 import Link from "next/link";
-import axios from "axios";
+import { useSearchParams } from "next/navigation";
+
 const Page = () => {
+  const searchParams = useSearchParams();
+
+  const [error, setError] = useState("");
+
+  // Handle error messages passed via query parameters
+  useEffect(() => {
+    const errorParam = searchParams?.get("error");
+    if (errorParam) {
+      setError(errorParam);
+    }
+  }, [searchParams]);
+
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-
       password: "",
     },
   });
+
   const loginWithGoogle = async () => {
     setIsLoading(true);
     try {
-      toast.success("Working.");
-      await signIn("google");
+      toast.success("Redirecting to Google...");
+      await signIn("google", { callbackUrl: "/dashboard" });
     } catch (error) {
-      toast.error("Error signing with Google.");
-      throw new Error("Error signining in.");
+      toast.error("Error signing in with Google.");
     } finally {
       setIsLoading(false);
     }
   };
+
   async function onSubmit(formData: z.infer<typeof formSchema>) {
+    setIsLoading(true);
     try {
-      setIsLoading(true);
-      await signIn("credentials", {
+      // Handle credential sign in
+      const res = await signIn("credentials", {
+        redirect: false, // Do not redirect automatically
         email: formData.email,
         password: formData.password,
+        callbackUrl: "/dashboard", // URL to redirect after successful login
       });
+
+      if (res?.error) {
+        // Set error message to be displayed
+        setError(res.error);
+        toast.error(res.error);
+      } else if (res?.ok) {
+        // Redirect to dashboard on successful login
+        toast.success("Login successful.");
+        window.location.href = res.url || "/dashboard";
+      }
     } catch (error) {
-      toast.error("Invalid Credentials");
+      toast.error("Error signing in.");
     } finally {
       setIsLoading(false);
     }
@@ -75,7 +100,7 @@ const Page = () => {
               Login
             </CardTitle>
             <CardDescription className="text-md">
-              Enter your Login Detials
+              Enter your Login Details
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -89,19 +114,12 @@ const Page = () => {
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl font-bold  ">
-                        Email
-                      </FormLabel>
-
+                      <FormLabel className="text-xl font-bold">Email</FormLabel>
                       <FormControl>
                         <Input
                           placeholder="Enter email address"
                           {...field}
                           className="w-full"
-                          value={form.getValues("email")}
-                          onChange={(e) =>
-                            form.setValue("email", e.target.value)
-                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -113,28 +131,43 @@ const Page = () => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-xl font-bold  ">
+                      <FormLabel className="text-xl font-bold">
                         Password
                       </FormLabel>
-
                       <FormControl>
                         <Input
                           placeholder="Enter password"
                           {...field}
                           className="w-full"
                           type="password"
-                          value={form.getValues("password")}
-                          onChange={(e) =>
-                            form.setValue("password", e.target.value)
-                          }
                         />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                <Button type="submit" className="w-full " disabled={isLoading}>
-                  Login
+
+                {/* Error message display */}
+                {error && (
+                  <div className="text-red-500 text-center">
+                    {error === "CredentialsSignin" &&
+                      "Invalid email or password."}
+                    {error === "OAuthAccountNotLinked" &&
+                      "Please sign in with the correct provider."}
+                    {error === "AccessDenied" &&
+                      "Access denied, please contact support."}
+                    {error === "Configuration" &&
+                      "Server configuration issue, try again later."}
+                    {error === "default" && "Login failed. Please try again."}
+                  </div>
+                )}
+
+                <Button type="submit" className="w-full" disabled={isLoading}>
+                  {isLoading ? (
+                    <LucideLoaderCircle className="animate-spin h-4 w-4" />
+                  ) : (
+                    "Login"
+                  )}
                 </Button>
               </form>
             </Form>
@@ -143,7 +176,7 @@ const Page = () => {
             <Button
               disabled={isLoading}
               type="button"
-              className="max-w-sm  w-fit gap-4"
+              className="max-w-sm w-fit gap-4"
               onClick={loginWithGoogle}
             >
               {isLoading ? (
@@ -161,29 +194,6 @@ const Page = () => {
             </Link>
           </CardFooter>
         </Card>
-        {/*  <div className="flex min-h-full items-center justify-center py-12 px-4 sm:px-6 lg:px-8 ">
-        <div className="w-full flex flex-col items-center max-w-md space-y-8 ">
-          <div className="flex flex-col items-center gap-8 ">
-          Logo
-          <h2 className="mt-6 text-center text-3xl font-bold tracking-tight text-gray-900 ">
-          Sign in to your account
-          </h2>
-          </div>
-          <Button
-          disabled={isLoading}
-          type="button"
-          className="max-w-sm mx-auto w-full"
-          onClick={loginWithGoogle}
-          >
-          {isLoading ? (
-            <LucideLoaderCircle className="animate-spin h-4 w-4" />
-            ) : (
-              <FcGoogle />
-              )}
-              Sign in With Google
-              </Button>
-              </div>
-              </div> */}
       </main>
     </>
   );
