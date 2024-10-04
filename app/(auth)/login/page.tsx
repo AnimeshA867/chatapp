@@ -98,6 +98,10 @@ const Page = () => {
                           placeholder="Enter email address"
                           {...field}
                           className="w-full"
+                          value={form.getValues("email")}
+                          onChange={(e) =>
+                            form.setValue("email", e.target.value)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
@@ -119,6 +123,10 @@ const Page = () => {
                           {...field}
                           className="w-full"
                           type="password"
+                          value={form.getValues("password")}
+                          onChange={(e) =>
+                            form.setValue("password", e.target.value)
+                          }
                         />
                       </FormControl>
                       <FormMessage />

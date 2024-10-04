@@ -81,7 +81,9 @@ const FriendRequests: FC<FriendRequestsProps> = ({
             className="flex gap-4 items-center p-4 border-b"
           >
             <UserPlus className="text-black" />
-            <p className="font-medium text-lg">{requests.senderEmail}</p>
+            <div>
+              <p className="font-medium text-lg">{requests.senderEmail}</p>
+            </div>
             <button
               onClick={() => acceptFriend(requests.senderId)}
               aria-label="Accept Friend"

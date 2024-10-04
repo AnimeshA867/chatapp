@@ -65,7 +65,8 @@ export async function POST(req: NextRequest) {
 
     //Valid Friend request:4263eeda8f56
 
-    db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id);
+    await db.sadd(`user:${idToAdd}:incoming_friend_requests`, session.user.id);
+    await db.sadd(`user:${session.user.id}:outgoing_friend_requests`, idToAdd);
 
     return new Response("OK");
   } catch (error) {

@@ -25,7 +25,7 @@ const page: FC<pageProps> = async ({}) => {
       const sender = JSON.parse(
         await fetchRedis("get", `user:${senderId}`)
       ) as User;
-
+      console.log(sender);
       return { senderId, senderEmail: sender.email };
     })
   );
