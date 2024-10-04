@@ -24,13 +24,13 @@ export async function POST(req: Request) {
       return new Response("Already friends", { status: 400 });
     }
 
-    const hasIncomingRequests = await fetchRedis(
+    const hasOutGoing = await fetchRedis(
       "sismember",
-      `user:${session.user.id}:incoming_friend_requests`,
+      `user:${session.user.id}:outgoing_friend_requests`,
       idToReject
     );
 
-    if (!hasIncomingRequests) {
+    if (!hasOutGoing) {
       return new Response("No such friend requests", { status: 400 });
     }
     await Promise.all([
@@ -39,8 +39,8 @@ export async function POST(req: Request) {
         idToReject
       ),
       await db.srem(
-        `user:${idToReject}:outgoing_friend_requests`,
-        session.user.id
+        `user:${session.user.id}:outgoing_friend_requests`,
+        idToReject
       ),
     ]);
     return new Response("OK");

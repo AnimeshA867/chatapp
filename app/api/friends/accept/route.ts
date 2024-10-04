@@ -66,8 +66,8 @@ export async function POST(req: Request) {
         idToAdd
       ),
       await db.srem(
-        `user:${session.user.id}:outgoing_friend_requests`,
-        idToAdd
+        `user:${idToAdd}:outgoing_friend_requests`,
+        session.user.id
       ),
     ]);
 

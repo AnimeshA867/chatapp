@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     const isAlreadyFriends = (await fetchRedis(
       "sismember",
       `user:${session.user.id}:friends`,
-      session.user.id
+      idToAdd
     )) as 0 | 1;
 
     if (isAlreadyFriends) {
