@@ -17,18 +17,12 @@ const Page = async () => {
 
   const friendWithLastMessageRaw = await Promise.all(
     friends.map(async (friend) => {
-      console.log(
-        `chat:${chatHrefConstructor(session.user.id, friend.id)}:messages`
-      );
       const [lastMessageRaw] = (await fetchRedis(
         "zrange",
         `chat:${chatHrefConstructor(session.user.id, friend.id)}:messages`,
         -1,
         -1
       )) as string[];
-      if (!lastMessageRaw) {
-        return;
-      }
       const lastMessage = JSON.parse(lastMessageRaw) as Message;
       return {
         ...friend,
@@ -37,8 +31,7 @@ const Page = async () => {
     })
   );
   const friendWithLastMessage = friendWithLastMessageRaw.filter(Boolean);
-  console.log(friendWithLastMessageRaw);
-  console.log(friendWithLastMessage);
+
   return (
     <>
       <div className="container py-12 ">

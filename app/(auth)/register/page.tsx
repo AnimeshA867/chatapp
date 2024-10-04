@@ -64,8 +64,6 @@ const Page = () => {
       });
       router.replace(`/login`);
     } catch (error) {
-      console.log("Error Signing in.");
-      console.log(error);
     } finally {
       setIsLoading(false);
     }
