@@ -1,6 +1,6 @@
 "use client";
 
-import { FC, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -27,12 +27,31 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+  CommandShortcut,
+} from "@/components/ui/command";
+
 import { addFriendValidator as formSchema } from "@/lib/validator/addFriendValidator";
 import toast from "react-hot-toast";
 import React from "react";
-interface AddFriendBtnProps {}
+import { getUsers } from "@/app/helper/getUsers";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+interface AddFriendBtnProps {
+  users: User[];
+  sessionId: string;
+}
 
-const AddFriendBtn: FC<AddFriendBtnProps> = ({}) => {
+const AddFriendBtn: FC<AddFriendBtnProps> = ({ users, sessionId }) => {
+  const router = useRouter();
+  const [value, setValue] = useState("");
   // 1. Define your form.
   const [showSuccessState, setShowSuccessState] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
@@ -45,6 +64,8 @@ const AddFriendBtn: FC<AddFriendBtnProps> = ({}) => {
   // 2. Define a submit handler.
   function onSubmit(formData: z.infer<typeof formSchema>) {
     addFriend(formData.email);
+    router.refresh();
+    form.setValue("email", "");
   }
 
   const addFriend = async (email: string) => {
@@ -71,35 +92,92 @@ const AddFriendBtn: FC<AddFriendBtnProps> = ({}) => {
     }
   };
 
+  const usersToAdd = users.sort().filter((user) => {
+    return user.id !== sessionId;
+  });
+
+  useEffect(() => {
+    console.log(value);
+  }, [value]);
+
   return (
     <>
-      <Card className="w-[350px]">
-        <CardHeader></CardHeader>
+      <Card className="md:w-[500px] border-b shadow-sm  shadow-black flex flex-col ">
+        <CardHeader>
+          <h1 className={"font-bold md:text-5xl text-3xl mb-8 text-center"}>
+            Add a friend
+          </h1>
+        </CardHeader>
         <CardContent>
           <Form {...form}>
             <form
               onSubmit={form.handleSubmit(onSubmit)}
-              className="w-2/3 space-y-6"
+              className="w-full space-y-6 "
             >
               <FormField
                 control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-xl font-bold">Email</FormLabel>
+                    <FormLabel className="text-xl font-bold  ">Email</FormLabel>
+
                     <FormControl>
-                      <Input
+                      {/*  <Input
                         placeholder="Enter email address"
                         {...field}
                         className="w-[20rem]"
-                      />
+                      /> */}
+                      <Command>
+                        <CommandInput
+                          placeholder="Enter the name"
+                          value={value}
+                          onValueChange={setValue}
+                        />
+                        <CommandList>
+                          <CommandEmpty>No results found.</CommandEmpty>
+                          <CommandGroup>
+                            {value !== "" &&
+                              usersToAdd.map((user, _) => (
+                                <CommandItem
+                                  key={user.id}
+                                  onSelect={(value) => {
+                                    setValue(value);
+                                    form.setValue("email", user.email);
+                                  }}
+                                >
+                                  <div className="py-1 px-2 flex justify-center items-center border-b-2 border-gray-200 last:border-none gap-4 cursor-pointer hover:ring-2 hover:ring-indigo-500 w-full rounded-md group">
+                                    <div className="h-8 w-8 m-auto overflow-hidden relative ">
+                                      <Image
+                                        fill
+                                        referrerPolicy="no-referrer"
+                                        src={user.image}
+                                        alt={`${user.name}'s Photo`}
+                                        className="rounded-full group-hover:ring-2 hover:ring-indigo-500"
+                                      />
+                                    </div>
+                                    <div className="h-4/5 w-4/5 flex-auto ">
+                                      <span className="indent-0 text-md text-gray-700 font-semibold">
+                                        {user.name}
+                                      </span>{" "}
+                                      <span className="indent-4 text-sm text-gray-600 font-semibold">
+                                        {user.email}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </CommandItem>
+                              ))}
+                          </CommandGroup>
+                          <CommandSeparator />
+                        </CommandList>
+                      </Command>
                     </FormControl>
-                    <FormDescription>Enter your friends email</FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <Button type="submit">Submit</Button>
+              <Button type="submit" className="w-full ">
+                Add Friend
+              </Button>
             </form>
           </Form>
         </CardContent>

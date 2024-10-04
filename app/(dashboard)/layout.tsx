@@ -49,8 +49,8 @@ export default async function Layout({
   ).length;
 
   return (
-    <section className="w-full flex h-screen ">
-      <div className="md:hidden fixed top-0 left-0 w-full h-16 flex justify-between items-center px-4 border-b-2 border-gray-200">
+    <section className="w-full flex h-screen flex-col md:flex-row">
+      <div className="md:hidden w-full h-16 flex justify-between items-center px-4 border-b-2 border-gray-200 flex-shrink-0">
         <MobileChatLayout
           friends={friends}
           sessionId={session?.user.id}

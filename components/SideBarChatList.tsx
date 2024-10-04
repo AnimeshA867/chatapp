@@ -20,7 +20,7 @@ interface extendedMessage extends Message {
 const SideBarChatList: FC<SideBarChatListProps> = ({ friends, sessionId }) => {
   const router = useRouter();
   const pathName = usePathname();
-
+  const [friend, setFriend] = useState<User[]>(friends);
   // State to track unseen messages
   const [unseenMessages, setUnseenMessages] = useState<Message[]>([]);
 
@@ -34,7 +34,8 @@ const SideBarChatList: FC<SideBarChatListProps> = ({ friends, sessionId }) => {
   }, [pathName]);
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  const newFriendHandler = () => {
+  const newFriendHandler = (newFriends: User) => {
+    setFriend((prev) => [...prev, newFriends]);
     router.refresh();
   };
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -81,7 +82,7 @@ const SideBarChatList: FC<SideBarChatListProps> = ({ friends, sessionId }) => {
 
   return (
     <ul role="list" className="max-h-[20rem] overflow-y-auto -mx-2 space-y-1">
-      {friends.map((friend: User) => {
+      {friend.map((friend: User) => {
         const unseenMessagesCount = unseenMessages.filter(
           (msg) => msg.senderId === friend.id
         ).length;
