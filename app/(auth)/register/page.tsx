@@ -8,7 +8,7 @@ import toast from "react-hot-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { loginValidator as formSchema } from "@/lib/validator/signUpValidator";
+import { signUpValidator as formSchema } from "@/lib/validator/signUpValidator";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -30,20 +30,22 @@ import {
 } from "@/components/ui/form";
 import Link from "next/link";
 import axios from "axios";
+import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 const Page = () => {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
-
+      name: "",
       password: "",
     },
   });
   const loginWithGoogle = async () => {
     setIsLoading(true);
     try {
-      toast.success("Working.");
       await signIn("google");
     } catch (error) {
       toast.error("Error signing with Google.");
@@ -55,12 +57,15 @@ const Page = () => {
   async function onSubmit(formData: z.infer<typeof formSchema>) {
     try {
       setIsLoading(true);
-      await signIn("credentials", {
+      await axios.post(`/api/register`, {
+        name: formData.name,
         email: formData.email,
         password: formData.password,
       });
+      router.replace(`/login`);
     } catch (error) {
-      toast.error("Invalid Credentials");
+      console.log("Error Signing in.");
+      console.log(error);
     } finally {
       setIsLoading(false);
     }
@@ -72,10 +77,10 @@ const Page = () => {
         <Card className="w-[500px] aspect-square flex justify-center flex-col">
           <CardHeader>
             <CardTitle className="text-3xl font-bold md:text-4xl">
-              Login
+              Register
             </CardTitle>
             <CardDescription className="text-md">
-              Enter your Login Detials
+              Enter your Detials
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -84,6 +89,27 @@ const Page = () => {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="w-full space-y-6 "
               >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xl font-bold  ">
+                        Name
+                      </FormLabel>
+
+                      <FormControl>
+                        <Input
+                          placeholder="Enter your name"
+                          {...field}
+                          autoComplete={"off"}
+                          className="w-full"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
                 <FormField
                   control={form.control}
                   name="email"
@@ -98,6 +124,7 @@ const Page = () => {
                           placeholder="Enter email address"
                           {...field}
                           className="w-full"
+                          autoComplete={"off"}
                         />
                       </FormControl>
                       <FormMessage />
@@ -118,6 +145,7 @@ const Page = () => {
                           placeholder="Enter password"
                           {...field}
                           className="w-full"
+                          autoComplete={"off"}
                           type="password"
                         />
                       </FormControl>
@@ -126,12 +154,13 @@ const Page = () => {
                   )}
                 />
                 <Button type="submit" className="w-full " disabled={isLoading}>
-                  Login
+                  Sign Up
                 </Button>
               </form>
             </Form>
           </CardContent>
-          <CardFooter className="flex justify-evenly items-center space-x-4 px-4">
+
+          <CardFooter className="flex justify-evenly items-center space-x-4 px-4 ">
             <Button
               disabled={isLoading}
               type="button"
@@ -145,11 +174,12 @@ const Page = () => {
               )}
               Sign in With Google
             </Button>
+
             <Link
-              href="/register"
+              href="/login"
               className="bg-green-600 flex-1 text-center h-full flex justify-center items-center rounded-lg hover:bg-green-700"
             >
-              Sign up
+              Login
             </Link>
           </CardFooter>
         </Card>

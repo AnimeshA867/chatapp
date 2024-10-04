@@ -44,6 +44,7 @@ import React from "react";
 import { getUsers } from "@/app/helper/getUsers";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import { UserPlus } from "lucide-react";
 interface AddFriendBtnProps {
   users: User[];
   sessionId: string;
@@ -141,27 +142,35 @@ const AddFriendBtn: FC<AddFriendBtnProps> = ({ users, sessionId }) => {
                                 <CommandItem
                                   key={user.id}
                                   onSelect={(value) => {
-                                    setValue(value);
+                                    setValue(user.name);
                                     form.setValue("email", user.email);
                                   }}
                                 >
                                   <div className="py-1 px-2 flex justify-center items-center border-b-2 border-gray-200 last:border-none gap-4 cursor-pointer hover:ring-2 hover:ring-indigo-500 w-full rounded-md group">
                                     <div className="h-8 w-8 m-auto overflow-hidden relative ">
-                                      <Image
-                                        fill
-                                        referrerPolicy="no-referrer"
-                                        src={user.image}
-                                        alt={`${user.name}'s Photo`}
-                                        className="rounded-full group-hover:ring-2 hover:ring-indigo-500"
-                                      />
+                                      {user.image ? (
+                                        <Image
+                                          fill
+                                          referrerPolicy="no-referrer"
+                                          src={
+                                            user.image !== null
+                                              ? user.image
+                                              : ""
+                                          }
+                                          alt={`${user.name}'s Photo`}
+                                          className="rounded-full group-hover:ring-2 hover:ring-indigo-500"
+                                        />
+                                      ) : (
+                                        <UserPlus className="mx-auto my-auto" />
+                                      )}
                                     </div>
                                     <div className="h-4/5 w-4/5 flex-auto ">
-                                      <span className="indent-0 text-md text-gray-700 font-semibold">
+                                      <p className="indent-0 text-md text-gray-700 font-semibold">
                                         {user.name}
-                                      </span>{" "}
-                                      <span className="indent-4 text-sm text-gray-600 font-semibold">
+                                      </p>{" "}
+                                      <p className="text-sm text-gray-600 font-semibold">
                                         {user.email}
-                                      </span>
+                                      </p>
                                     </div>
                                   </div>
                                 </CommandItem>
