@@ -37,7 +37,7 @@ const Message: FC<MessageProps> = ({
       pusherClient.unsubscribe(channel);
       pusherClient.unbind(`${chatId}`, chatHandler);
     };
-  }, [chatId]);
+  }, []);
 
   // Handler for incoming messages
   const chatHandler = (message: Message) => {
@@ -106,7 +106,9 @@ const Message: FC<MessageProps> = ({
                 <Image
                   fill
                   src={
-                    isCurrentUser ? (sessionImg as string) : chatPartner.image
+                    isCurrentUser
+                      ? sessionImg || "/default.png"
+                      : chatPartner.image || "/default.png"
                   }
                   alt={
                     isCurrentUser ? (sessionUser as string) : chatPartner.name

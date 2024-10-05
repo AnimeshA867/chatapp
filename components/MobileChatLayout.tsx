@@ -120,7 +120,7 @@ const MobileChatLayout: FC<MobileChatLayoutType> = ({
                         fill
                         referrerPolicy="no-referrer"
                         className="rounded-full"
-                        src={sessionImage || ""}
+                        src={sessionImage || "/default.png"}
                         alt="Your Profile Picture"
                       />
                     </div>

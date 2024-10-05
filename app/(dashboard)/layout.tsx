@@ -112,7 +112,7 @@ export default async function Layout({
                     fill
                     referrerPolicy="no-referrer"
                     className="rounded-full"
-                    src={session?.user.image || ""}
+                    src={session?.user.image || "/default.png"}
                     alt="Your Profile Picture"
                   />
                 </div>

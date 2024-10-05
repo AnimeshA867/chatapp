@@ -73,13 +73,13 @@ const Page = async () => {
           validFriends.map((friend) => (
             <div
               key={friend.id}
-              className="relative bg-zinc-50 border-zinc-200 p-3 rounded-lg hover:ring-indigo-500 hover:ring transition ease-linear duration-200  "
+              className="relative bg-zinc-50 border-zinc-200 p-3 rounded-lg hover:ring-indigo-500 hover:ring transition ease-linear duration-200 gap-8 mb-4 last:mb-0"
             >
               <div className="absolute right-4 inset-y-0 flex items-center ">
                 <ChevronRight className="h-7 w-7 text-zinc-400" />
               </div>
               <a
-                className="relative sm:flex "
+                className="relative sm:flex mt-auto h-full"
                 href={`/dashboard/chat/${chatHrefConstructor(
                   session.user.id,
                   friend.id
@@ -91,7 +91,7 @@ const Page = async () => {
                       referrerPolicy="no-referrer"
                       className="rounded-full"
                       alt={`${friend.name}'s Profile`}
-                      src={friend.image}
+                      src={friend.image || "/default.png"}
                       fill
                     />
                   </div>

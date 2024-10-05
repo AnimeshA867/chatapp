@@ -152,11 +152,7 @@ const AddFriendBtn: FC<AddFriendBtnProps> = ({ users, sessionId }) => {
                                         <Image
                                           fill
                                           referrerPolicy="no-referrer"
-                                          src={
-                                            user.image !== null
-                                              ? user.image
-                                              : ""
-                                          }
+                                          src={user.image || "/default.png"}
                                           alt={`${user.name}'s Photo`}
                                           className="rounded-full group-hover:ring-2 hover:ring-indigo-500"
                                         />
