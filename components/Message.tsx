@@ -26,27 +26,33 @@ const Message: FC<MessageProps> = ({
   const scrollDownRef = useRef<HTMLDivElement | null>(null);
   const [messages, setMessages] = useState(initialMessages);
 
+  // Chat handler now defined before useEffect to ensure it's available for cleanup
+  const chatHandler = (message: Message) => {
+    console.log("New message received:", message); // Debug logging
+    setMessages((prev) => [...prev, message]); // Update state with new message
+  };
+
   // Pusher setup to listen to new messages
   useEffect(() => {
     const channel = toPusherKey(`chat:${chatId}`);
+    console.log("Subscribing to channel:", channel);
 
     pusherClient.subscribe(channel);
-    pusherClient.bind(`incoming-messages`, chatHandler);
+    pusherClient.bind("incoming-messages", chatHandler);
 
     return () => {
+      console.log("Unsubscribing from channel:", channel);
       pusherClient.unsubscribe(channel);
-      pusherClient.unbind(`incoming-messages`, chatHandler);
+      pusherClient.unbind("incoming-messages", chatHandler);
     };
-  }, []);
-
-  // Handler for incoming messages
-  const chatHandler = (message: Message) => {
-    setMessages((prev) => [...prev, message]);
-  };
+  }, [chatId]); // Added `chatId` as dependency to ensure cleanup
 
   // Scroll to the bottom when messages are updated
   useEffect(() => {
-    scrollDownRef.current?.scrollIntoView({ behavior: "smooth" });
+    // Small delay to ensure smooth scrolling after the message is rendered
+    setTimeout(() => {
+      scrollDownRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, 100); // Delay to ensure smooth scrolling
   }, [messages]);
 
   const formatTimestamp = (timestamp: number) => {
