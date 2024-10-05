@@ -31,11 +31,11 @@ const Message: FC<MessageProps> = ({
     const channel = toPusherKey(`chat:${chatId}`);
 
     pusherClient.subscribe(channel);
-    pusherClient.bind(`${chatId}`, chatHandler);
+    pusherClient.bind(`incoming-messages`, chatHandler);
 
     return () => {
       pusherClient.unsubscribe(channel);
-      pusherClient.unbind(`${chatId}`, chatHandler);
+      pusherClient.unbind(`incoming-messages`, chatHandler);
     };
   }, []);
 

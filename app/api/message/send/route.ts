@@ -53,7 +53,11 @@ export async function POST(req: Request) {
 
     const message = messageSchema.parse(messageData);
 
-    pusherServer.trigger(toPusherKey(`chat:${id}`), id, messageData);
+    pusherServer.trigger(
+      toPusherKey(`chat:${id}`),
+      "incoming-messages",
+      messageData
+    );
     pusherServer.trigger(toPusherKey(`user:${friendId}:chats`), "new_message", {
       ...message,
       senderImg: sender.image,
